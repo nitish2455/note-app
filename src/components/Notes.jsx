@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CreateNote from './CreateNote';
 import './notes.css';
-import { v4 as uuid } from 'uuid';
 import Note from './Note';
 
 const Notes = () => {
@@ -9,6 +8,7 @@ const Notes = () => {
   const [notes, setNotes] = useState([]);
   const [editToggle, setEditToggle] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [idCounter, setIdCounter] = useState(1);
 
   const editHandler = (id, text) => {
     setEditToggle(id);
@@ -26,10 +26,11 @@ const Notes = () => {
       setNotes((prevNotes) => [
         ...prevNotes,
         {
-          id: uuid(),
+          id: idCounter,
           text: inputText,
         },
       ]);
+      setIdCounter((prevCounter) => prevCounter + 1);
     }
 
     setInputText('');
@@ -49,6 +50,9 @@ const Notes = () => {
     const data = JSON.parse(localStorage.getItem('Notes'));
     if (data) {
       setNotes(data);
+      // Find the highest existing ID to set the counter
+      const maxId = Math.max(...data.map((note) => note.id), 0);
+      setIdCounter(maxId + 1);
     }
   }, []);
 
@@ -59,7 +63,7 @@ const Notes = () => {
   return (
     <div className='notes'>
       <input
-      className='search-input'
+        className='search-input'
         type='text'
         placeholder='Search notes...'
         value={searchTerm}
